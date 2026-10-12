@@ -736,7 +736,7 @@ async function startTyping() {
   if (letterFullyTyped) return;
   if (letterContent.children.length > 0) {
     letterFullyTyped = true;
-     setTimeout(() => { if (isOpen) openPhoto(); }, 700); // <-- thêm dòng này
+    
 
     return;
   }
@@ -778,6 +778,7 @@ async function startTyping() {
  
   isTyping = false;
   letterFullyTyped = true;
+   setTimeout(() => { if (isOpen) openPhoto(); }, 700); // <-- thêm dòng này
 }
 
 function sleep(ms) {

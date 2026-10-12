@@ -486,6 +486,57 @@
   to { width: 100%; }
 }
 
+
+    /* ===== POPUP ẢNH ===== */
+.photo-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 44, 63, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 300;
+}
+.photo-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.photo-frame {
+  background: #fff;
+  padding: 10px;
+  border: 3px solid #f48fb1;
+  border-radius: 14px;
+  box-shadow: 0 0 0 6px rgba(255,255,255,0.6),
+              0 20px 50px rgba(233,30,99,0.35);
+  max-width: 88vw;
+  transform: scale(0) rotate(-8deg);
+  transition: transform 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.photo-overlay.show .photo-frame {
+  transform: scale(1) rotate(-2deg);
+}
+.photo-frame img {
+  display: block;
+  max-width: 100%;
+  max-height: 68vh;
+  border-radius: 8px;
+}
+.photo-hint {
+  margin-top: 18px;
+  color: #fff;
+  font-size: 0.9rem;
+  opacity: 0;
+  transition: opacity 0.6s ease 0.6s;
+}
+.photo-overlay.show .photo-hint {
+  opacity: 0.9;
+}
   </style>
 </head>
 <body>
@@ -503,14 +554,19 @@
         <div class="envelope-body"></div>
         <div class="flap"></div>
         <div class="letter" id="letter">
-          <h2>Gửi bé iu của anhhh <333</h2>
+          <h2>Gửi vợ iuuuuuu <333 <333</h2>
           <div class="letter-content" id="letter-content"></div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
+<div class="photo-overlay" id="photo-overlay">
+  <div class="photo-frame" id="photo-frame">
+    <img src="1.jpg" alt="Ảnh kỷ niệm" />
+  </div>
+  <div class="photo-hint">Chạm ra ngoài để đóng 💕</div>
+</div>
 <script>
 const CORRECT_CODE = "1610";
 const screenInput = document.getElementById("screen-input");
@@ -662,6 +718,7 @@ screenLetter.addEventListener("click", (e) => {
 function closeEnvelope() {
   if (!isOpen) return;
   isOpen = false;
+   closePhoto(); 
  
   letter.classList.add("closing");
  
@@ -679,6 +736,8 @@ async function startTyping() {
   if (letterFullyTyped) return;
   if (letterContent.children.length > 0) {
     letterFullyTyped = true;
+     setTimeout(() => { if (isOpen) openPhoto(); }, 700); // <-- thêm dòng này
+
     return;
   }
   if (isTyping) return;
@@ -724,7 +783,25 @@ async function startTyping() {
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+const photoOverlay = document.getElementById("photo-overlay");
+const photoFrame = document.getElementById("photo-frame");
 
+function openPhoto() {
+  photoOverlay.classList.add("show");
+}
+function closePhoto() {
+  photoOverlay.classList.remove("show");
+}
+
+// Chạm ra ngoài khung ảnh thì đóng
+photoOverlay.addEventListener("click", (e) => {
+  if (!photoFrame.contains(e.target)) closePhoto();
+});
+
+// Chạm vào thư (sau khi gõ xong) thì mở lại ảnh
+letter.addEventListener("click", () => {
+  if (letterFullyTyped && !isTyping) openPhoto();
+});
 createKeypad();
 updateDisplay();
 </script>

@@ -1,181 +1,734 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="vi">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="img/flowers.png" type="image/x-icon">
-    <title>foryou</title>
-    <style type="text/css">
-        @import url('https://fonts.googleapis.com/css?family=Indie+Flower');
-        @import url('https://fonts.googleapis.com/css?family=Amatic+SC');
+  <meta charset="UTF-8" />
+  
+  <!-- TẮT HOÀN TOÀN THU PHÓNG / ZOOM -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="HandheldFriendly" content="true" />
+  
+  <title>Happy Birthday</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      touch-action: manipulation;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #ffecf5 0%, #fff5f9 50%, #e6f0ff 100%);
+      color: #4a2c3f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      padding: 20px;
+    }
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(173,216,230,0.18) 0%, transparent 40%),
+                  radial-gradient(circle at 70% 80%, rgba(255,182,193,0.15) 0%, transparent 45%);
+      animation: wavePulse 12s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: -1;
+    }
+    @keyframes wavePulse {
+      0% { transform: scale(1.0); opacity: 0.6; }
+      50% { transform: scale(1.15); opacity: 0.8; }
+      100% { transform: scale(1.0); opacity: 0.6; }
+    }
+    .container {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      z-index: 1;
+    }
+    #screen-input {
+      background: rgba(255, 245, 250, 0.88);
+      border: 1px solid #ffb6c1;
+      border-radius: 20px;
+      padding: 2.2rem 1.6rem;
+      box-shadow: 0 10px 34px rgba(255,182,193,0.22);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    #screen-input.hidden {
+      opacity: 0;
+      transform: scale(0.94);
+      pointer-events: none;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+      20%, 40%, 60%, 80% { transform: translateX(8px); }
+    }
+    #screen-input.shake {
+      animation: shake 0.5s;
+    }
+    h1 {
+      font-size: 1.7rem;
+      margin-bottom: 1.6rem;
+      color: #e91e63;
+      letter-spacing: 1.2px;
+      text-shadow: 0 2px 6px rgba(233,30,99,0.15);
+    }
+    .code-display {
+      font-size: 2.6rem;
+      letter-spacing: 18px;
+      font-weight: 700;
+      color: #c2185b;
+      background: rgba(255,255,255,0.7);
+      border: 2px solid #f8bbd0;
+      border-radius: 14px;
+      padding: 12px 20px;
+      margin: 1.2rem auto 1.8rem;
+      width: 210px;
+      min-height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .code-display.filled {
+      border-color: #ec407a;
+      color: #d81b60;
+      background: rgba(255,235,238,0.9);
+    }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      max-width: 240px;
+      margin: 0 auto;
+    }
+    .key {
+      aspect-ratio: 1;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #c2185b;
+      background: linear-gradient(145deg, #fff0f5, #ffebee);
+      border: 2px solid #f8bbd0;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.22s;
+      box-shadow: 0 5px 12px rgba(233,30,99,0.12);
+    }
+    .key:hover {
+      transform: translateY(-4px) scale(1.08);
+      background: linear-gradient(145deg, #ffebee, #fff0f5);
+      border-color: #ec407a;
+      box-shadow: 0 10px 20px rgba(233,30,99,0.22);
+    }
+    .key:active {
+      transform: translateY(1px) scale(0.96);
+      box-shadow: 0 3px 8px rgba(233,30,99,0.18);
+    }
+    .key.zero {
+      grid-column: 2;
+    }
+    #error-msg {
+      margin-top: 1.2rem;
+      color: #d81b60;
+      font-weight: 500;
+      min-height: 1.4em;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #error-msg.show {
+      opacity: 1;
+    }
+    #screen-letter {
+      opacity: 0;
+      transform: scale(0.92);
+      transition: all 0.9s ease;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 20px;
+      z-index: 100;
+    }
+    #screen-letter.visible {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+    .instruction {
+      color: #c2185b;
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 1.2rem;
+      text-align: center;
+      animation: pulse 2s ease-in-out infinite;
+      margin-top: 20vh;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+    .envelope-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      perspective: 1100px;
+    }
+    .envelope {
+      width: 100%;
+      height: 240px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.5s ease;
+      margin-bottom: 1.6rem;
+    }
+    .envelope:hover:not(.open):not(.closing) {
+      transform: translateY(-6px);
+    }
+    .envelope-body {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, #fff5f9, #ffebee);
+      border: 3px solid #f8bbd0;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(233,30,99,0.18);
+      z-index: 1;
+    }
+    .flap {
+      position: absolute;
+      width: 100%;
+      height: 52%;
+      top: 0;
+      left: 0;
+      background: linear-gradient(to bottom, #ffe0e8, #ffcdd2);
+      border: 3px solid #f8bbd0;
+      border-bottom: none;
+      border-radius: 14px 14px 0 0;
+      transform-origin: top center;
+      transition: transform 1s cubic-bezier(0.23, 1, 0.32, 1);
+      z-index: 3;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      box-shadow: 0 7px 18px rgba(233,30,99,0.15);
+    }
+    .envelope.open .flap {
+      transform: rotateX(-180deg);
+    }
+    .envelope.closing .flap {
+      transform: rotateX(0deg) !important;
+    }
+    .letter {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 92%;
+      max-width: 380px;
+      height: 480px;
+      background: #ffffff;
+      border: 2px solid #ffebee;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding: 2rem 1.8rem;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #4a2c3f;
+      opacity: 0;
+      z-index: 4;
+      pointer-events: none;
+      transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.6s;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .letter::-webkit-scrollbar {
+      display: none;
+    }
+    .envelope.open .letter {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .letter.closing {
+      transform: translate(-50%, -50%) scale(0) !important;
+      opacity: 0 !important;
+      transition: transform 0.6s cubic-bezier(0.6, 0, 0.8, 0.2), opacity 0.5s !important;
+    }
+    @media (max-width: 480px) {
+      .letter {
+        width: 94%;
+        height: 460px;
+        padding: 1.8rem 1.6rem;
+        font-size: 0.94rem;
+      }
+    }
+    @media (max-height: 700px) {
+      .letter {
+        height: 420px;
+      }
+      .instruction {
+        margin-top: 10vh;
+      }
+    }
+    .bold { font-weight: bold; }
+    .italic { font-style: italic; }
+    .pink { color: #e91e63; font-weight: 600; }
 
-        body {
-            font-family: 'Indie Flower', cursive !important;
-            background: #f092be;
-            /*CAPE HONEY*/
-            margin: 0px;
-            padding: 0px;
-        }
+    /* === HIỆU ỨNG MỚI LUNG LINH === */
+    .glow {
+      color: #ff69b4;
+      text-shadow: 
+        0 0 7px #ff69b4,
+        0 0 10px #ff69b4,
+        0 0 21px #ff1493,
+        0 0 42px #ff1493;
+      animation: pulse-glow 2s ease-in-out infinite alternate;
+    }
+    @keyframes pulse-glow {
+      from { text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff1493, 0 0 30px #c71585; }
+      to   { text-shadow: 0 0 20px #ff69b4, 0 0 30px #ff1493, 0 0 50px #c71585; }
+    }
 
-        ::selection {
-            background: transparent;
-        }
+    .sparkle {
+      position: relative;
+      color: #fff;
+      background: linear-gradient(90deg, #ffe4e1, #ffb6c1, #ff69b4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: sparkle-shine 3s linear infinite;
+    }
+    .sparkle::after {
+      content: "✨";
+      position: absolute;
+      top: -10px;
+      right: -12px;
+      font-size: 0.7em;
+      animation: twinkle 1.5s infinite;
+    }
+    @keyframes sparkle-shine {
+      0%,100% { background-position: 0% 50%; }
+      50%     { background-position: 100% 50%; }
+    }
+    @keyframes twinkle {
+      0%,100% { opacity: 0.4; transform: scale(0.8); }
+      50%     { opacity: 1; transform: scale(1.2); }
+    }
 
-        h4 {
-            font-size: 30px;
-            line-height: 1px;
-            font-family: 'Amatic SC', cursive !important;
-        }
+    .rainbow {
+      background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff, #ff0000);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% 200%;
+      animation: rainbow-move 2s linear infinite;
+    }
+    @keyframes rainbow-move {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
 
-        .color1 {
-            color: #ff6c47
-        }
+    .heart {
+      color: #e91e63;
+      display: inline-block;
+      animation: heartbeat 1.2s infinite;
+    }
+    .heart::before {
+      content: "";
+      font-size: 1.1em;
+    }
+    @keyframes heartbeat {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(1.15); }
+    }
 
-        /*MOUNTAIN MEADOW*/
-        .color2 {
-            color: #16aadb
-                /*TALL POPPY*/
-        }
+    .shine {
+      background: linear-gradient(120deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 70%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: #ff69b4;
+      animation: shine-move 3s infinite;
+    }
+    @keyframes shine-move {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
 
+    .float {
+      display: inline-block;
+      animation: float-up-down 4s ease-in-out infinite;
+    }
+    @keyframes float-up-down {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-6px); }
+    }
 
-        .card {
-            color: #013243;
-            /*SHERPA BLUE*/
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 300px;
-            height: 400px;
-            background: #e0e1dc;
-            transform-style: preserve-3d;
-            transform: translate(-50%, -50%) perspective(2000px);
-            box-shadow: inset 400px 0 50px rgba(0, 0, 0, .5), 20px 0 60px rgba(0, 0, 0, .5);
-            transition: 2s;
-        }
+    .typing-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: #e91e63;
+      margin-left: 2px;
+      animation: blink 0.7s infinite;
+    }
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    
+    /* ===== HIỆU ỨNG BỔ SUNG ===== */
 
-        .card:hover {
-            transform: translate(-50%, -50%) perspective(2000px) rotate(15deg) scale(1.2);
-            box-shadow: inset 20px 0 50px rgba(0, 0, 0, .5), 0 10px 100px rgba(0, 0, 0, .5);
-        }
+.gradient {
+  background: linear-gradient(90deg, #ff9a9e, #fad0c4, #fad0c4, #ffdde1);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientMove 6s ease infinite;
+}
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
-        .card:before {
-            content: '';
-            position: absolute;
-            top: -5px;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: #BAC1BA;
-            transform-origin: bottom;
-            transform: skewX(-45deg);
-        }
+.shadow {
+  color: #e91e63;
+  text-shadow: 3px 3px 8px rgba(0,0,0,0.25);
+}
 
-        .card:after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: -5px;
-            width: 5px;
-            height: 100%;
-            background: #92A29C;
-            transform-origin: left;
-            transform: skewY(-45deg);
-        }
+.outline {
+  color: transparent;
+  -webkit-text-stroke: 1px #e91e63;
+}
 
-        .card .imgBox {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-origin: left;
-            transition: .7s;
-        }
+.bounce {
+  display: inline-block;
+  animation: bounceText 1.2s infinite;
+}
+@keyframes bounceText {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
 
-        .card .bark {
-            position: absolute;
-            background: #e0e1dc;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: .7s;
-        }
+.shake-text {
+  display: inline-block;
+  animation: shakeText 0.6s infinite;
+}
+@keyframes shakeText {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
 
-        .card .imgBox img {
-            min-width: 250px;
-            max-height: 400px;
-        }
+.pulse-text {
+  animation: pulseText 1.5s infinite;
+}
+@keyframes pulseText {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
 
-        .card:hover .imgBox {
-            transform: rotateY(-135deg);
-        }
+.love {
+  color: #ff1493;
+  font-weight: 600;
+  animation: loveBeat 1.3s infinite;
+}
+@keyframes loveBeat {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
 
-        .card:hover .bark {
-            opacity: 1;
-            transition: .6s;
-            box-shadow: 300px 200px 100px rgba(0, 0, 0, .4) inset;
-        }
+.gold {
+  background: linear-gradient(45deg, #ffd700, #fff8dc, #daa520);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-        .card .details {
-            position: absolute;
-            top: 0;
-            left: 0;
-            box-sizing: border-box;
-            padding: 0 0 0 10px;
-            z-index: -1;
-            margin-top: 40px;
-        }
+.fire {
+  background: linear-gradient(0deg, #ff0000, #ff8c00, #ffff00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fireMove 2s linear infinite;
+}
+@keyframes fireMove {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.4); }
+  100% { filter: brightness(1); }
+}
 
-        .card .details p {
-            font-size: 15px;
-            line-height: 5px;
-            transform: rotate(-10deg);
-            padding: 0 0 0 20px;
-        }
+.type {
+  border-right: 2px solid #e91e63;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: typingEffect 3s steps(30, end), blink 0.7s infinite;
+}
+@keyframes typingEffect {
+  from { width: 0; }
+  to { width: 100%; }
+}
 
-        .card .details h4 {
-            text-align: center;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-    </style>
-    <link rel="stylesheet" type="text/css" href="https://cdn.prinsh.com/NathanPrinsley-textstyle/nprinsh-stext.css" />
+  </style>
 </head>
-
 <body>
-    <div class="card">
-        <div class="imgBox">
-            <Sediv class="bark"></Sediv>
-            <img src="https://assets.cardly.net/production/artwork/8/9/8/898e1f13-0dfa-6d62-664e-070005c2f046/detail/cute-happy-birthday-dog-p1-r2.webp"
-                width="100%" height="100%">
+<div class="container">
+  <div id="screen-input">
+    <h1>NHẬP MÃ BÍ MẬT</h1>
+    <div class="code-display" id="code-display">••••</div>
+    <div class="keypad" id="keypad"></div>
+    <div id="error-msg"></div>
+  </div>
+  <div id="screen-letter">
+    <div class="instruction">✨ Nhấn vào phong bì để mở thư ✨</div>
+    <div class="envelope-wrapper">
+      <div class="envelope" id="envelope">
+        <div class="envelope-body"></div>
+        <div class="flap"></div>
+        <div class="letter" id="letter">
+          <h2>Gửi bé iu của anhhh <333</h2>
+          <div class="letter-content" id="letter-content"></div>
         </div>
-        <div class="details">
-            <h4 class="color1">Happy Birthday</h2>
-                <h4 class="color2 margin">To You</h3>
-                    <p>Happy birthday kinan,</p>
-                    <p>today ur day,</p>
-                    <p>i just wanna say thank you very much for</p>
-                    <p>all the experience</p>
-                    <p>and interactions we've been through,</p>
-                    <p>im so glad to know u,</p>
-                    <p>i hope u'll always have a beautiful day.</p>
-                    <p>Don't forget about ur health,</p>
-                    <p>please stay healthy and happy,</p>
-                    <p>and once again..</p>
-                    <p>happy birthday to you</p>
-
-                    <p class="text-right">-sean</p>
-                    <p class="text-right"></p>
-
-                    <audio autoplay loop>
-                        <source src="musik/love.mp3" type="audio/mpeg">
-                     </audio>
-
-        </div>
+      </div>
     </div>
+  </div>
+</div>
 
+<script>
+const CORRECT_CODE = "1302";
+const screenInput = document.getElementById("screen-input");
+const screenLetter = document.getElementById("screen-letter");
+const codeDisplay = document.getElementById("code-display");
+const keypad = document.getElementById("keypad");
+const errorMsg = document.getElementById("error-msg");
+const envelope = document.getElementById("envelope");
+const letter = document.getElementById("letter");
+const letterContent = document.getElementById("letter-content");
+const birthdaySong = new Audio("hpbd.mp3");
+birthdaySong.volume = 0.65;
+
+let currentCode = "";
+let isTyping = false;
+let isOpen = false;
+let letterFullyTyped = false;
+
+const letterText = [
+
+  "Chúc mừng sinh nhật <h>bé yêu</h> tròn <glow>20 tuổi</glow> - <rainbow>Ngày đặc biệt nhất </rainbow>",
+
+  "Hôm nay là một ngày <glow>rất đặc biệt</glow> — vì <b>bé iu của anh có thêm 1 tuổi mới</b>.",
+
+  "Anh mong tuổi mới mang đến cho em <rainbow> nhiều niềm vui và may mắn</rainbow>, và những khoảnh khắc <shine>hạnh phúc nhất trong cuộc đời mình</shine>.",
+
+  "Cảm ơn bé vì đã <love>đến bên anh</love>, và đã <love>ở lại</love> ngay cả khi mọi thứ với anh chưa từng hoàn hảo.",
+
+  "Có thể anh không nói nhiều, nhưng anh luôn chắc chắn một điều: <i>bé là người anh muốn ở <float>cạnh lâu dài</float></i>.",
+
+  "Tuổi mới, anh mong bé luôn <outline>bình yên</outline>, <outline>mạnh mẽ</outline> và đôi khi vẫn <bounce>nhõng nhẽo đáng yêu</bounce> như bây giờ.",
+
+  "Nếu có lúc buồn, đừng <shake>suy nghĩ quá nhiều</shake> — vì phía sau bé luôn có một người <b>âm thầm dõi theo</b>.",
+
+  "Anh không hứa những điều xa vời, chỉ hứa sẽ <bounce><glow>thương bé thật lâu</glow></bounce>, theo cách <float>chậm rãi và chân thành nhất...<float> <heart>❤️</heart>",
+
+  "<glow><b>Anh iu</b></glow>"
+];
+
+
+
+function applyFormatting(text) {
+  return text
+    .replace(/<b>(.*?)<\/b>/g, '<span class="bold">$1</span>')
+    .replace(/<i>(.*?)<\/i>/g, '<span class="italic">$1</span>')
+    .replace(/<h>(.*?)<\/h>/g, '<span class="pink">$1</span>')
+    .replace(/<glow>(.*?)<\/glow>/g, '<span class="glow">$1</span>')
+    .replace(/<sparkle>(.*?)<\/sparkle>/g, '<span class="sparkle">$1</span>')
+    .replace(/<rainbow>(.*?)<\/rainbow>/g, '<span class="rainbow">$1</span>')
+    .replace(/<heart>(.*?)<\/heart>/g, '<span class="heart">$1</span>')
+    .replace(/<shine>(.*?)<\/shine>/g, '<span class="shine">$1</span>')
+    .replace(/<float>(.*?)<\/float>/g, '<span class="float">$1</span>')
+    .replace(/<gradient>(.*?)<\/gradient>/g, '<span class="gradient">$1</span>')
+    .replace(/<shadow>(.*?)<\/shadow>/g, '<span class="shadow">$1</span>')
+    .replace(/<outline>(.*?)<\/outline>/g, '<span class="outline">$1</span>')
+    .replace(/<bounce>(.*?)<\/bounce>/g, '<span class="bounce">$1</span>')
+    .replace(/<shake>(.*?)<\/shake>/g, '<span class="shake-text">$1</span>')
+    .replace(/<pulse>(.*?)<\/pulse>/g, '<span class="pulse-text">$1</span>')
+    .replace(/<love>(.*?)<\/love>/g, '<span class="love">$1</span>')
+    .replace(/<gold>(.*?)<\/gold>/g, '<span class="gold">$1</span>')
+    .replace(/<fire>(.*?)<\/fire>/g, '<span class="fire">$1</span>')
+    .replace(/<type>(.*?)<\/type>/g, '<span class="type">$1</span>');
+}
+
+
+function createKeypad() {
+  for (let i = 1; i <= 9; i++) createKey(i);
+  createKey(0, true);
+}
+
+function createKey(value, isZero = false) {
+  const key = document.createElement("button");
+  key.className = "key";
+  if (isZero) key.classList.add("zero");
+  key.textContent = value;
+  key.addEventListener("click", () => {
+    if (currentCode.length < 4) {
+      currentCode += value;
+      updateDisplay();
+      if (currentCode.length === 4) checkCode();
+    }
+  });
+  keypad.appendChild(key);
+}
+
+function updateDisplay() {
+  codeDisplay.textContent = currentCode.padEnd(4, "•");
+  codeDisplay.classList.toggle("filled", currentCode.length === 4);
+}
+
+function vibrateDevice() {
+  if ('vibrate' in navigator) {
+    navigator.vibrate([100, 50, 100, 50, 100]);
+  }
+}
+
+function checkCode() {
+  if (currentCode === CORRECT_CODE) {
+    birthdaySong.play().catch(err => console.error("Không thể phát nhạc:", err));
+    screenInput.classList.add("hidden");
+    setTimeout(() => {
+      screenInput.style.display = "none";
+      screenLetter.classList.add("visible");
+    }, 700);
+  } else {
+    vibrateDevice();
+    errorMsg.textContent = "Mã không đúng";
+    errorMsg.classList.add("show");
+    currentCode = "";
+    updateDisplay();
+    screenInput.classList.add("shake");
+    setTimeout(() => {
+      screenInput.classList.remove("shake");
+      setTimeout(() => {
+        errorMsg.classList.remove("show");
+      }, 2000);
+    }, 500);
+  }
+}
+
+envelope.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (!envelope.classList.contains("open") && !envelope.classList.contains("closing")) {
+    envelope.classList.add("open");
+    isOpen = true;
+    if (!letterFullyTyped) {
+      setTimeout(() => startTyping(), 700);
+    }
+  }
+});
+
+screenLetter.addEventListener("click", (e) => {
+  if (!isOpen) return;
+  if (isTyping) return;
+ 
+  const envelopeRect = envelope.getBoundingClientRect();
+  const letterRect = letter.getBoundingClientRect();
+ 
+  const clickedInside = (
+    e.clientX >= letterRect.left &&
+    e.clientX <= letterRect.right &&
+    e.clientY >= letterRect.top &&
+    e.clientY <= letterRect.bottom
+  );
+ 
+  if (!clickedInside) {
+    closeEnvelope();
+  }
+});
+
+function closeEnvelope() {
+  if (!isOpen) return;
+  isOpen = false;
+ 
+  letter.classList.add("closing");
+ 
+  setTimeout(() => {
+    envelope.classList.add("closing");
+  }, 100);
+ 
+  setTimeout(() => {
+    envelope.classList.remove("open", "closing");
+    letter.classList.remove("closing");
+  }, 1200);
+}
+
+async function startTyping() {
+  if (letterFullyTyped) return;
+  if (letterContent.children.length > 0) {
+    letterFullyTyped = true;
+    return;
+  }
+  if (isTyping) return;
+ 
+  isTyping = true;
+ 
+  for (let i = 0; i < letterText.length; i++) {
+    if (!isOpen) {
+      isTyping = false;
+      return;
+    }
+   
+    const p = document.createElement("p");
+    if (i === letterText.length - 1) {
+      p.style.textAlign = "right";
+      p.style.marginTop = "2rem";
+    }
+    p.classList.add("typing");
+    letterContent.appendChild(p);
+   
+    const formatted = applyFormatting(letterText[i]);
+    let displayed = "";
+   
+    for (let char of formatted) {
+      if (!isOpen) {
+        isTyping = false;
+        return;
+      }
+      displayed += char;
+      p.innerHTML = displayed + '<span class="typing-cursor"></span>';
+      await sleep(Math.random() * 30 + 20);
+      letter.scrollTop = letter.scrollHeight;
+    }
+   
+    p.innerHTML = displayed;
+    await sleep(400);
+  }
+ 
+  isTyping = false;
+  letterFullyTyped = true;
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+createKeypad();
+updateDisplay();
+</script>
 </body>
-
 </html>
-

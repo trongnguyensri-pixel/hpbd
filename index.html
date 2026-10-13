@@ -537,6 +537,14 @@
 .photo-overlay.show .photo-hint {
   opacity: 0.9;
 }
+
+    .photo-frame audio {
+  display: block;
+  width: 100%;
+  min-width: 240px;
+  margin-top: 10px;
+  height: 40px;
+}
   </style>
 </head>
 <body>
@@ -564,6 +572,7 @@
 <div class="photo-overlay" id="photo-overlay">
   <div class="photo-frame" id="photo-frame">
     <img src="1.jpg" alt="Ảnh kỷ niệm" />
+     <audio id="wish-audio" src="2.wav" controls preload="auto"></audio>
   </div>
   <div class="photo-hint">Chạm ra ngoài để đóng 💕</div>
 </div>
@@ -584,6 +593,7 @@ let currentCode = "";
 let isTyping = false;
 let isOpen = false;
 let letterFullyTyped = false;
+  let unlockingAudio = false;
 
 const letterText = [
 
@@ -690,6 +700,20 @@ envelope.addEventListener("click", (e) => {
   if (!envelope.classList.contains("open") && !envelope.classList.contains("closing")) {
     envelope.classList.add("open");
     isOpen = true;
+
+    // mở khóa âm thanh cho lời chúc (phát im lặng rồi dừng ngay)
+    unlockingAudio = true;
+    wishAudio.muted = true;
+    wishAudio.play().then(() => {
+      wishAudio.pause();
+      wishAudio.currentTime = 0;
+      wishAudio.muted = false;
+      unlockingAudio = false;
+    }).catch(() => {
+      wishAudio.muted = false;
+      unlockingAudio = false;
+    });
+
     if (!letterFullyTyped) {
       setTimeout(() => startTyping(), 700);
     }
@@ -778,7 +802,7 @@ async function startTyping() {
  
   isTyping = false;
   letterFullyTyped = true;
-   setTimeout(() => { if (isOpen) openPhoto(); }, 700); // <-- thêm dòng này
+    setTimeout(() => { if (isOpen) { openPhoto(); playWish(); } }, 700);
 }
 
 function sleep(ms) {
@@ -786,13 +810,31 @@ function sleep(ms) {
 }
 const photoOverlay = document.getElementById("photo-overlay");
 const photoFrame = document.getElementById("photo-frame");
+const wishAudio = document.getElementById("wish-audio");
 
 function openPhoto() {
   photoOverlay.classList.add("show");
 }
+
 function closePhoto() {
   photoOverlay.classList.remove("show");
+  wishAudio.pause();
 }
+
+function playWish() {
+  wishAudio.currentTime = 0;
+  wishAudio.play().catch(err => console.error("Không thể phát lời chúc:", err));
+}
+
+// Ghi âm bắt đầu phát (kể cả nghe lại) thì dừng nhạc nền
+wishAudio.addEventListener("play", () => {
+  if (!unlockingAudio) birthdaySong.pause();
+});
+
+// Ghi âm kết thúc thì phát lại nhạc nền
+wishAudio.addEventListener("ended", () => {
+  birthdaySong.play().catch(err => console.error("Không thể phát nhạc:", err));
+});
 
 // Chạm ra ngoài khung ảnh thì đóng
 photoOverlay.addEventListener("click", (e) => {

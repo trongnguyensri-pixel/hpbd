@@ -700,6 +700,19 @@ envelope.addEventListener("click", (e) => {
   if (!envelope.classList.contains("open") && !envelope.classList.contains("closing")) {
     envelope.classList.add("open");
     isOpen = true;
+
+    // mở khóa âm thanh: play rồi pause NGAY, không chờ
+    try {
+      wishAudio.volume = 0;
+      const p = wishAudio.play();
+      wishAudio.pause();
+      wishAudio.currentTime = 0;
+      wishAudio.volume = 1;
+      if (p && p.catch) p.catch(() => { wishAudio.volume = 1; });
+    } catch (err) {
+      wishAudio.volume = 1;
+    }
+
     if (!letterFullyTyped) {
       setTimeout(() => startTyping(), 700);
     }
@@ -809,9 +822,11 @@ function closePhoto() {
 
 function playWish() {
   wishAudio.currentTime = 0;
-  wishAudio.play().catch(err => console.error("Không thể phát lời chúc:", err));
+  wishAudio.play().catch(() => {
+    // bị chặn tự phát: nhắc người nhận bấm nút phát
+    document.querySelector(".photo-hint").textContent = "Bấm ▶ để nghe lời chúc 💕";
+  });
 }
-
 // Ghi âm bắt đầu phát (kể cả nghe lại) thì dừng nhạc nền
 wishAudio.addEventListener("play", () => {
   if (!letterFullyTyped) {

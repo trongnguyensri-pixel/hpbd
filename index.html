@@ -593,7 +593,7 @@ let currentCode = "";
 let isTyping = false;
 let isOpen = false;
 let letterFullyTyped = false;
-  let unlockingAudio = false;
+ 
 
 const letterText = [
 
@@ -700,20 +700,6 @@ envelope.addEventListener("click", (e) => {
   if (!envelope.classList.contains("open") && !envelope.classList.contains("closing")) {
     envelope.classList.add("open");
     isOpen = true;
-
-    // mở khóa âm thanh cho lời chúc (phát im lặng rồi dừng ngay)
-    unlockingAudio = true;
-    wishAudio.muted = true;
-    wishAudio.play().then(() => {
-      wishAudio.pause();
-      wishAudio.currentTime = 0;
-      wishAudio.muted = false;
-      unlockingAudio = false;
-    }).catch(() => {
-      wishAudio.muted = false;
-      unlockingAudio = false;
-    });
-
     if (!letterFullyTyped) {
       setTimeout(() => startTyping(), 700);
     }
@@ -828,7 +814,12 @@ function playWish() {
 
 // Ghi âm bắt đầu phát (kể cả nghe lại) thì dừng nhạc nền
 wishAudio.addEventListener("play", () => {
-  if (!unlockingAudio) birthdaySong.pause();
+  if (!letterFullyTyped) {
+    wishAudio.pause();
+    wishAudio.currentTime = 0;
+    return;
+  }
+  birthdaySong.pause();
 });
 
 // Ghi âm kết thúc thì phát lại nhạc nền
